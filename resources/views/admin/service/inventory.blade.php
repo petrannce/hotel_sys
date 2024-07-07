@@ -1,0 +1,148 @@
+@extends('layouts.admin.header')
+@section('content')
+
+<!-- Page Content -->
+<div class="content container-fluid">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Services</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Services</li>
+                </ul>
+            </div>
+            <div class="col-auto float-right ml-auto">
+                <a href="#" class="btn add-btn" data-toggle="modal" data-target="#add_service"><i
+                        class="fa fa-plus"></i> Add Services</a>
+            </div>
+        </div>
+    </div>
+    <!-- /Page Header -->
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-striped custom-table mb-0 datatable">
+                    <thead>
+                        <tr>
+                            <th>*</th>
+                            <th>Service </th>
+                            <th>Department </th>
+                            <th class="text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach ($services as $service)
+
+                        <tr>
+                            <td>{{$loop->index + 1}}</td>
+                            <td>{{$service->name}}</td>
+                            <td>{{$service->department}}</td>
+                            <td class="text-right">
+                                <div class="dropdown dropdown-action">
+                                    <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown"
+                                        aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="{{route('service.edit', $service->id)}}"><i
+                                                class="fa fa-pencil m-r-5"></i>
+                                            Edit</a>
+                                        <a class="dropdown-item" href="{{route('service.destroy', $service->id)}}"
+                                            data-toggle="modal" data-target="#delete_designation"><i
+                                                class="fa fa-trash-o m-r-5"></i>
+                                            Delete</a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        @endforeach
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Page Content -->
+
+<!-- Add Service Modal -->
+<div id="add_service" class="modal custom-modal fade" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Service</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{route('service.store')}}" method="post">
+                    @csrf
+
+                    <div class="form-group">
+                        <label>Service <span class="text-danger">*</span></label>
+                        <input class="form-control" type="text" name="name">
+                    </div>
+                    <div class="form-group">
+                        <label>Department <span class="text-danger">*</span></label>
+                        <select class="select" name="department">
+                            <option value="">Select Department</option>
+                            @foreach ($departments as $department)
+                            <option value="{{$department->name}}">{{$department->name}}</option>
+                            @endforeach
+
+                        </select>
+                    </div>
+                    <div class="submit-section">
+                        <button class="btn btn-primary submit-btn">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Add Service Modal -->
+
+<!-- Delete Service Modal -->
+<div class="modal custom-modal fade" id="delete_designation" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="form-header">
+                    <h3>Delete Service</h3>
+                    <p>Are you sure want to delete?</p>
+                </div>
+                <div class="modal-btn delete-action">
+                    <div class="row">
+                        @if(isset($service))
+                        <form method="POST" action="{{ route('service.destroy', $service->id) }}">
+                            @endif
+                            @csrf
+                            @method('DELETE')
+
+                            <div class="modal-btn delete-action">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-primary continue-btn"
+                                            style="width: 212px; height: 49px;">Delete</button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" class="btn btn-primary cancel-btn" data-dismiss="modal"
+                                            style="width: 212px; height: 49px;">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Delete Designation Modal -->
+
+@endsection
