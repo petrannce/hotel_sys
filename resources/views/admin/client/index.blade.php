@@ -29,10 +29,8 @@
                     <thead>
                         <tr>
                             <th>Name</th>
-                            <th>Client ID</th>
                             <th>Email</th>
                             <th>Mobile</th>
-                            <th>Status</th>
                             <th class="text-right">Action</th>
                         </tr>
                     </thead>
@@ -40,22 +38,8 @@
                         @foreach ($clients as $client)
                         <tr>
                             <td>{{$client->fname}} {{$client->lname}}</td>
-                            <td>{{$client->client_id}}</td>
                             <td>{{$client->email}}</td>
                             <td>{{$client->phone}}</td>
-                            <td>
-                                <div class="dropdown action-label">
-                                    <a href="#" class="btn btn-white btn-sm btn-rounded dropdown-toggle"
-                                        data-toggle="dropdown" aria-expanded="false"><i
-                                            class="fa fa-dot-circle-o text-success"></i> Active </a>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="#"><i
-                                                class="fa fa-dot-circle-o text-success"></i> Active</a>
-                                        <a class="dropdown-item" href="#"><i class="fa fa-dot-circle-o text-danger"></i>
-                                            Inactive</a>
-                                    </div>
-                                </div>
-                            </td>
                             <td class="text-right">
                                 <div class="dropdown dropdown-action">
                                     <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown"
@@ -91,7 +75,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{{ route('client.store') }}" method="POST">
+                <form id="addClientForm" action="{{ route('client.store') }}" method="POST">
                     @csrf
 
                     <div class=" row">
@@ -127,8 +111,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="col-form-label">Client ID <span class="text-danger">*</span></label>
-                                <input class="form-control floating" type="text" name="client_id">
+                                <label for="client_id" class="col-form-label">Client ID <span class="text-danger">*</span></label>
+                                <input class="form-control floating" id="client_id" type="text" name="client_id" readonly>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -186,5 +170,33 @@
     </div>
 </div>
 <!-- /Delete Client Modal -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Attach event listener to the modal open event
+    $('#add_client').on('show.bs.modal', function (e) {
+        // Fetch the last client_id from the server
+        $.ajax({
+            url: '{{ route('client.latest_id') }}',
+            method: 'GET',
+            success: function(response) {
+                let lastClientId = response.client_id;
+                let nextIdNumber = 1;
+
+                if (lastClientId) {
+                    nextIdNumber = parseInt(lastClientId.substring(3)) + 1;
+                }
+
+                let newClientId = 'CL' + nextIdNumber.toString().padStart(4, '0');
+                $('#client_id').val(newClientId);
+            },
+            error: function() {
+                console.error('Failed to fetch last client_id.');
+            }
+        });
+    });
+});
+</script>
+
 
 @endsection

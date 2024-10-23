@@ -10,7 +10,7 @@
                     <img alt="" src="assets/img/profiles/avatar-02.jpg">
                 </div>
                 <div class="welcome-det">
-                    <h3>Welcome, CLT-214</h3>
+                    <h3>Welcome, {{Auth::user()->fname}}</h3>
                     <p>{{ now()->format('l, d F Y') }}</p>
                 </div>
             </div>

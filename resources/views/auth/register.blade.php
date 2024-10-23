@@ -52,22 +52,50 @@
                         <form method="POST" action="{{ route('register') }}">
                             @csrf
 
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ __('First Name') }}</label>
+                                        <input id="fname" type="text" class="form-control" name="fname" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ __('Last Name') }}</label>
+                                        <input id="lname" type="text" class="form-control" name="lname" required>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group">
-                                <label>{{ __('Name') }}</label>
-                                <input id="name" type="text" class="form-control" name="name" required>
+                                <label>{{ __('Username') }}</label>
+                                <input id="username" type="text" class="form-control" name="username" required>
                             </div>
                             <div class="form-group">
                                 <label>{{ __('Email Address') }}</label>
                                 <input id="email" type="email" class="form-control" name="email" required>
                             </div>
                             <div class="form-group">
-                                <label>{{ __('Password') }}</label>
-                                <input id="password" type="password" name="password" class="form-control" required>
+                                <label>{{ __(key: 'Phone Number') }}</label>
+                                <input id="phone" type="text" class="form-control" name="phone" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ __('Password') }}</label>
+                                        <input id="password" type="password" name="password" class="form-control"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>{{ __('Confirm Password') }}</label>
+                                        <input id="password-confirm" class="form-control" type="password"
+                                            name="password_confirmation">
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>{{ __('Confirm Password') }}</label>
-                                <input id="password-confirm" class="form-control" type="password"
-                                    name="password_confirmation">
+                                <input id="role" type="text" class="form-control" name="role" value="client" hidden>
                             </div>
                             <div class="form-group text-center">
                                 <button class="btn btn-primary account-btn" type="submit">{{ __('Register') }}</button>

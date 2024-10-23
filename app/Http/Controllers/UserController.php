@@ -13,7 +13,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return view('admin.user.index',compact('users'));
+        return view('admin.user.index', compact('users'));
     }
 
     public function create()
@@ -30,7 +30,7 @@ class UserController extends Controller
         ]);
 
         //dd($request->all());
-        
+
         DB::beginTransaction();
 
         try {
@@ -40,7 +40,7 @@ class UserController extends Controller
             $user->password = Hash::make($request->password);
             $user->save();
 
-            DB::commit();   
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());
@@ -62,7 +62,7 @@ class UserController extends Controller
             'email' => 'required',
             'password' => 'required',
         ]);
-        
+
         DB::beginTransaction();
 
         try {
@@ -87,4 +87,22 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('user.index')->with('success', 'User deleted successfully.');
     }
+
+    public function changeRole(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'role' => 'required|in:admin,employee,client', // Adjust roles as needed
+        ]);
+    
+        // Find the user and update the role
+        $user = User::findOrFail($request->id);
+        $user->role = $request->role;
+        $user->save();
+    
+        // Redirect back with a success message
+        return redirect()->back()->with('success', 'Role updated successfully!');
+    }
+
 }

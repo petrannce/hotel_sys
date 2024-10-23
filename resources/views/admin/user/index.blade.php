@@ -31,32 +31,65 @@
                             <th>*</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Role</th>
                             <th>Created Date</th>
                             <th class="text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($users as $user)
-                        <tr>
-                            <td>{{$loop->index + 1}}</td>
-                            <td>{{$user->name}}</td>
-                            <td>{{$user->email}}</td>
-                            <td>{{$user->created_at}}</td>
-                            <td class="text-right">
-                                <div class="dropdown dropdown-action">
-                                    <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown"
-                                        aria-expanded="false"><i class="material-icons">more_vert</i></a>
-                                    <div class="dropdown-menu dropdown-menu-right">
-                                        <a class="dropdown-item" href="{{route('user.edit', $user->id)}}"><i
-                                                class="fa fa-pencil m-r-5"></i>
-                                            Edit</a>
-                                        <a class="dropdown-item" href="{{route('user.destroy', $user->id)}}"
-                                            data-toggle="modal" data-target="#delete_user"><i
-                                                class="fa fa-trash-o m-r-5"></i> Delete</a>
+                            <tr>
+                                <td>{{$loop->index + 1}}</td>
+                                <td>{{$user->fname}} {{$user->lname}}</td>
+                                <td>{{$user->email}}</td>
+                                <td>
+    <div class="dropdown action-label">
+        <a href="#" class="btn btn-white btn-sm btn-rounded dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <i class="fa fa-dot-circle-o text-warning"></i> {{ $user->role }}
+        </a>
+        <div class="dropdown-menu">
+            <form action="{{ route('change.role') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $user->id }}">
+                <button type="submit" name="role" value="admin" class="dropdown-item">
+                    <i class="fa fa-dot-circle-o text-danger"></i> Admin
+                </button>
+            </form>
+            <form action="{{ route('change.role') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $user->id }}">
+                <button type="submit" name="role" value="employee" class="dropdown-item">
+                    <i class="fa fa-dot-circle-o text-warning"></i> Employee
+                </button>
+            </form>
+            <form action="{{ route('change.role') }}" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $user->id }}">
+                <button type="submit" name="role" value="client" class="dropdown-item">
+                    <i class="fa fa-dot-circle-o text-success"></i> Client
+                </button>
+            </form>
+        </div>
+    </div>
+</td>
+
+
+                                <td>{{$user->created_at}}</td>
+                                <td class="text-right">
+                                    <div class="dropdown dropdown-action">
+                                        <a href="#" class="action-icon dropdown-toggle" data-toggle="dropdown"
+                                            aria-expanded="false"><i class="material-icons">more_vert</i></a>
+                                        <div class="dropdown-menu dropdown-menu-right">
+                                            <a class="dropdown-item" href="{{route('user.edit', $user->id)}}"><i
+                                                    class="fa fa-pencil m-r-5"></i>
+                                                Edit</a>
+                                            <a class="dropdown-item" href="{{route('user.destroy', $user->id)}}"
+                                                data-toggle="modal" data-target="#delete_user"><i
+                                                    class="fa fa-trash-o m-r-5"></i> Delete</a>
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -123,8 +156,8 @@
 
                     <div class="row">
                         @if(isset($user))
-                        <form method="POST" action="{{ route('user.destroy', $user->id) }}">
-                            @endif
+                            <form method="POST" action="{{ route('user.destroy', $user->id) }}">
+                        @endif
                             @csrf
                             @method('DELETE')
 
@@ -148,5 +181,41 @@
     </div>
 </div>
 <!-- /Delete User Modal -->
+
+<script>
+$(document).ready(function () {
+    $('.change-role').on('click', function (e) {
+        e.preventDefault(); // Prevent the default anchor click behavior
+
+        var role = $(this).data('role'); // Get the new role
+        var userId = $(this).data('id'); // Get the user ID
+
+        console.log('Changing role to:', role, 'for user ID:', userId); // Debugging log
+
+        // Send the AJAX request
+        $.ajax({
+            url: '/change-role', // Update this URL to your actual route
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}', // Include CSRF token for security
+                role: role,
+                id: userId
+            },
+            success: function (response) {
+                console.log('Response:', response); // Debugging log
+                // Update the UI with the new role
+                $('a[data-id="' + userId + '"]').closest('div.dropdown').find('a.btn').text(role);
+                alert('Role updated successfully!');
+            },
+            error: function (xhr) {
+                console.error('Error:', xhr); // Debugging log
+                alert('Failed to update role: ' + xhr.responseText);
+            }
+        });
+    });
+});
+
+
+</script>
 
 @endsection

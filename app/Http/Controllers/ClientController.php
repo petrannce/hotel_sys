@@ -6,12 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Client;  
+use App\Models\User;
 
 class ClientController extends Controller
 {
     public function index()
     {
-        $clients = Client::all();
+        $clients = User::where('role', 'client')->get();
         return view('admin.client.index',compact('clients'));
     }
 
@@ -99,6 +100,16 @@ class ClientController extends Controller
         $client = Client::find($id);
         $client->delete();
         return redirect()->route('client.index')->with('success', 'Client deleted successfully.');
+    }
+
+    public function latestId()
+    {
+        $lastClient = Client::orderBy('client_id', 'desc')->first();
+        $lastClientId = $lastClient ? $lastClient->client_id : null;
+
+        return response()->json([
+            'client_id' => $lastClientId,
+        ]);
     }
     
 }

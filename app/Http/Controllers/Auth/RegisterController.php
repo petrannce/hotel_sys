@@ -49,9 +49,13 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
+            'fname' => ['required', 'string', 'min:3', 'max:255'],
+            'lname' => ['required', 'string', 'min:3', 'max:255'],
+            'username' => ['required', 'string', 'min:3', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone' => ['required', 'string', 'size:10', 'regex:/^[0-9]+$/', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', 'string', 'min:3', 'max:255'],
         ]);
     }
 
@@ -63,10 +67,23 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
-            'name' => $data['name'],
+        $user = User::create([
+            'fname' => $data['fname'],
+            'lname' => $data['lname'],
+            'username' => $data['username'],
             'email' => $data['email'],
+            'phone' => $data['phone'],
             'password' => Hash::make($data['password']),
         ]);
+
+        $user->assignRole($data['role'] ?? 'client');
+
+        return $user;
+
+    }
+
+    protected function registered($request, $user)
+    {
+        return redirect($this->redirectTo)->with('success', 'User created successfully.');
     }
 }

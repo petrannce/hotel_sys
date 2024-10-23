@@ -54,9 +54,21 @@
 
             <!-- Logo -->
             <div class="header-left">
-                <a href="index.html" class="logo">
+                @if (Auth::user()->hasRole('admin'))
+                <a href="{{route('admin.dashboard')}}" class="logo">
                     <img src="{{asset('assets/img/logo.png')}}" width="40" height="40" alt="">
                 </a>
+                @elseif (Auth::user()->hasRole('Client'))
+                <a href="{{route('client.dashboard')}}" class="logo">
+                    <img src="{{asset('assets/img/logo.png')}}" width="40" height="40" alt="">
+                </a>
+                @elseif (Auth::user()->hasRole('Employee'))
+                <a href="{{route('employee.dashboard')}}" class="logo">
+                    <img src="{{asset('assets/img/logo.png')}}" width="40" height="40" alt="">
+                </a>
+                
+                @endif
+                
             </div>
             <!-- /Logo -->
 
@@ -330,9 +342,9 @@
 
                 <li class="nav-item dropdown has-arrow main-drop">
                     <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                        <span class="user-img"><img src="assets/img/profiles/avatar-21.jpg" alt="">
+                        <span class="user-img"><img src="{{asset('assets/img/profiles/avatar-21.jpg')}}" alt="">
                             <span class="status online"></span></span>
-                        <span>{{Auth::user()->name}}</span>
+                        <span>{{Auth::user()->fname}}{{Auth::user()->lname}}</span>
                     </a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item" href="profile.html">My Profile</a>
@@ -384,6 +396,7 @@
 
     <!-- jQuery -->
     <script src="{{asset('assets/js/jquery-3.5.1.min.js')}}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Bootstrap Core JS -->
     <script src="{{asset('assets/js/popper.min.js')}}"></script>
