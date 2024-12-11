@@ -1,6 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Frontend\FrontendController;
+
+
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\HomeController;
@@ -26,19 +30,21 @@ use App\Http\Controllers\GalleryController;
 |
 */
 
-
-Route::get('/', [App\Http\Controllers\Frontend\FrontendController::class, 'index'])->name('home');
-Route::get('/about', [App\Http\Controllers\Frontend\FrontendController::class, 'about'])->name('about');
-Route::get('/contact', [App\Http\Controllers\Frontend\FrontendController::class, 'contact'])->name('contact');
-Route::post('/contact-store', [App\Http\Controllers\Frontend\FrontendController::class, 'contactStore'])->name('contact.store');
-Route::get('/services', [App\Http\Controllers\Frontend\FrontendController::class, 'services'])->name('services');
-Route::get('/service-details/{id}', [App\Http\Controllers\Frontend\FrontendController::class, 'serviceDetails'])->name('service-details');
-Route::get('/service-requests', [App\Http\Controllers\Frontend\FrontendController::class, 'serviceRequests'])->name('service-requests');
-Route::get('/rooms', [App\Http\Controllers\Frontend\RoomController::class, 'index'])->name('rooms');
-Route::get('/room-details/{id}', [App\Http\Controllers\Frontend\RoomController::class, 'show'])->name('room-details');
-Route::post('/booking', [App\Http\Controllers\Frontend\RoomController::class, 'store'])->name('store-booking');
-Route::get('/galleries', [App\Http\Controllers\Frontend\GalleryController::class, 'index'])->name('gallery');
-Route::get('/checkout', [App\Http\Controllers\Frontend\FrontendController::class, 'checkout'])->name('checkout');
+//frontend
+Route::controller(FrontendController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/about', 'about')->name('about');
+    Route::get('/contact', 'contact')->name('contact');
+    Route::post('/contact-store', 'contactStore')->name('contact.store');
+    Route::get('/services', 'services')->name('services');
+    Route::get('/service-details/{id}', 'serviceDetails')->name('service-details');
+    Route::get('/service-requests', 'serviceRequests')->name('service-requests');
+    Route::get('/rooms', 'rooms')->name('rooms');
+    Route::get('/room-details/{id}', 'roomDetails')->name('room-details');
+    Route::post('/booking', 'store')->name('store-booking');
+    Route::get('/galleries', 'galleries')->name('galleries');
+    Route::get('/checkout', 'checkout')->name('checkout');    
+});
 
 Auth::routes();
 
