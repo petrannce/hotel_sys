@@ -98,22 +98,30 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/service/{id}/delete', 'destroy')->name('service.destroy');
     });
 
-    Route::get('/request', [ServiceRequestController::class, 'index'])->name('request.index');
-    Route::get('/request/create', [ServiceRequestController::class, 'create'])->name('request.create');
-    Route::post('/request/store', [ServiceRequestController::class, 'store'])->name('request.store');
-    Route::get('/request/{id}/edit', [ServiceRequestController::class, 'edit'])->name('request.edit');
-    Route::put('/request/{id}/update', [ServiceRequestController::class, 'update'])->name('request.update');
-    Route::delete('/request/{id}/delete', [ServiceRequestController::class, 'destroy'])->name('request.destroy');
-    Route::patch('/service-request/{id}/status', [ServiceRequestController::class, 'updateStatus'])->name('service-request.updateStatus');
+    //service request
+    Route::controller(ServiceRequestController::class)->group(function () {
+        Route::get('/service-request', 'index')->name('request.index');
+        Route::get('/service-request/create', 'create')->name('request.create');
+        Route::post('/service-request/store', 'store')->name('request.store');
+        Route::get('/service-request/{id}/edit', 'edit')->name('request.edit');
+        Route::put('/service-request/{id}/update', 'update')->name('request.update');
+        Route::delete('/service-request/{id}/delete', 'destroy')->name('request.destroy');
+        Route::patch('/service-request/{id}/status', 'updateStatus')->name('request.updateStatus');
+    });
 
-    Route::get('/booking', [BookingController::class, 'index'])->name('booking.index');
-    Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
-    Route::post('/booking/store', [BookingController::class, 'store'])->name('booking.store');
-    Route::get('/booking/{id}/edit', [BookingController::class, 'edit'])->name('booking.edit');
-    Route::put('/booking/{id}/update', [BookingController::class, 'update'])->name('booking.update');
-    Route::delete('/booking/{id}/delete', [BookingController::class, 'destroy'])->name('booking.destroy');
-    Route::get('/available-rooms', [BookingController::class, 'getAvailableRooms']);
-    Route::patch('/booking/{id}/status', [BookingController::class, 'updateStatus'])->name('booking.updateStatus');
+    //booking
+    Route::controller(BookingController::class)->group(function () {
+        Route::get('/booking', 'index')->name('booking.index');
+        Route::get('/booking/create', 'create')->name('booking.create');
+        Route::post('/booking/store', 'store')->name('booking.store');
+        Route::get('/booking/{id}/edit', 'edit')->name('booking.edit');
+        Route::put('/booking/{id}/update', 'update')->name('booking.update');
+        Route::delete('/booking/{id}/delete', 'destroy')->name('booking.destroy');
+        Route::get('/available-rooms', 'getAvailableRooms');
+        Route::patch('/booking/{id}/status', 'updateStatus')->name('booking.updateStatus');
+    });
+
+    //room
 
     Route::get('/room', [RoomController::class, 'index'])->name('room.index');
     Route::get('/room/create', [RoomController::class, 'create'])->name('room.create');
