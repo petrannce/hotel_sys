@@ -79,20 +79,24 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     });
 
     //department
+    Route::controller(DepartmentController::class)->group(function () {
+        Route::get('/department', 'index')->name('department.index');
+        Route::get('/department/create', 'create')->name('department.create');
+        Route::post('/department/store', 'store')->name('department.store');
+        Route::get('/department/{id}/edit', 'edit')->name('department.edit');
+        Route::put('/department/{id}/update', 'update')->name('department.update');
+        Route::delete('/department/{id}/delete', 'destroy')->name('department.destroy');
+    });
 
-    Route::get('/department', [DepartmentController::class, 'index'])->name('department.index');
-    Route::get('/department/create', [DepartmentController::class, 'create'])->name('department.create');
-    Route::post('/department/store', [DepartmentController::class, 'store'])->name('department.store');
-    Route::get('/department/{id}/edit', [DepartmentController::class, 'edit'])->name('department.edit');
-    Route::put('/department/{id}/update', [DepartmentController::class, 'update'])->name('department.update');
-    Route::delete('/department/{id}/delete', [DepartmentController::class, 'destroy'])->name('department.destroy');
-
-    Route::get('/service', [ServiceController::class, 'index'])->name('service.index');
-    Route::get('/service/create', [ServiceController::class, 'create'])->name('service.create');
-    Route::post('/service/store', [ServiceController::class, 'store'])->name('service.store');
-    Route::get('/service/{id}/edit', [ServiceController::class, 'edit'])->name('service.edit');
-    Route::put('/service/{id}/update', [ServiceController::class, 'update'])->name('service.update');
-    Route::delete('/service/{id}/delete', [ServiceController::class, 'destroy'])->name('service.destroy');
+    //service
+    Route::controller(ServiceController::class)->group(function () {
+        Route::get('/service', 'index')->name('service.index');
+        Route::get('/service/create', 'create')->name('service.create');
+        Route::post('/service/store', 'store')->name('service.store');
+        Route::get('/service/{id}/edit', 'edit')->name('service.edit');
+        Route::put('/service/{id}/update', 'update')->name('service.update');
+        Route::delete('/service/{id}/delete', 'destroy')->name('service.destroy');
+    });
 
     Route::get('/request', [ServiceRequestController::class, 'index'])->name('request.index');
     Route::get('/request/create', [ServiceRequestController::class, 'create'])->name('request.create');
