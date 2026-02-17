@@ -5,7 +5,6 @@
 	================================================== -->
 
 <div class="section big-55-height over-hide z-bigger">
-
 	<div class="parallax parallax-top" style="background-image: url('img/gallery/10.jpg')"></div>
 	<div class="dark-over-pages"></div>
 
@@ -29,38 +28,59 @@
 			</div>
 			<div class="section clearfix"></div>
 
-			<div class="col-md-4 ajax-form">
-				<input id="contact-name" name="name" type="text" autocomplete="off"
-					value="{{Auth::user()->fname}} {{Auth::user()->lname}}" required />
-			</div>
-			<div class="col-md-4 mt-4 mt-md-0 ajax-form">
-				<input id="contact-email" name="email" type="email" autocomplete="off" value="{{Auth::user()->email}}"
-					required />
-			</div>
-			<div class="section clearfix"></div>
-			<div class="col-md-8 mt-4 ajax-form">
-				<textarea id="contact-message" name="message" placeholder="Tell Us Everything" required></textarea>
-			</div>
-			<div class="section clearfix"></div>
-			<div class="col-md-8 mt-3 ajax-checkbox">
-				<ul class="list">
-					<li class="list__item">
-						<label class="label--checkbox">
-							<input type="checkbox" class="checkbox" name="checkbox" required>
-							collect my details through this form
-						</label>
-					</li>
-				</ul>
-			</div>
-			<div class="section clearfix"></div>
-			<div class="col-md-8 mt-3 ajax-form text-center">
-				<button type="submit" class="send_message" id="send" data-lang="en"><span>submit</span></button>
-			</div>
+			<form id="contact-form" class="col-md-8">
+				@csrf
+
+				<div class="row">
+					<div class="col-md-6 ajax-form">
+						<input id="contact-name" name="name" type="text" placeholder="Enter your name" autocomplete="off"
+							value="{{ old('name', Auth::check() ? Auth::user()->fname . ' ' . Auth::user()->lname : '') }}" 
+							required />
+					</div>
+					<div class="col-md-6 mt-4 mt-md-0 ajax-form">
+						<input id="contact-email" name="email" type="email" placeholder="Enter your email" autocomplete="off" 
+							value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}"
+							required />
+					</div>
+					
+					<div class="section clearfix"></div>
+					
+					<div class="col-12 mt-4 ajax-form">
+						<textarea id="contact-message" name="message" placeholder="Tell Us Everything" required>{{ old('message') }}</textarea>
+					</div>
+					
+					<div class="section clearfix"></div>
+					
+					<div class="col-12 mt-3 ajax-checkbox">
+						<ul class="list">
+							<li class="list__item">
+								<label class="label--checkbox">
+									<input type="checkbox" class="checkbox" name="checkbox" id="consent-checkbox" required>
+									I agree to have my details collected through this form
+								</label>
+								<span id="checkbox-error" style="color: red; display: none; font-size: 12px; margin-top: 5px;">
+									You must agree to the terms before submitting
+								</span>
+							</li>
+						</ul>
+					</div>
+					
+					<div class="section clearfix"></div>
+					
+					<div class="col-12 mt-3 ajax-form text-center">
+						<button type="submit" class="send_message" id="send" data-lang="en">
+							<span>Submit</span>
+						</button>
+					</div>
+				</div>
+			</form>
+			
 			<div class="section clearfix"></div>
 			<div class="col-md-8 padding-top-bottom">
 				<div class="sep-line"></div>
 			</div>
 			<div class="section clearfix"></div>
+			
 			<!-- Address Information -->
 			<div class="col-md-6 col-lg-4">
 				<div class="address">
@@ -120,78 +140,118 @@
 				<h2 class="text-opacity">+254 7126 60170</h2>
 			</div>
 		</div>
-
 	</div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 	$(document).ready(function () {
-		// Variable to prevent multiple submissions
 		let isSubmitting = false;
 
-		$('#send').on('click', function (event) {
-			event.preventDefault(); // Prevent the default form submission
-
-			// Prevent further submissions if already submitting
-			if (isSubmitting) {
-				return; // Exit the function if a submission is already in progress
+		// Hide error message when checkbox is checked
+		$('#consent-checkbox').on('change', function() {
+			if ($(this).is(':checked')) {
+				$('#checkbox-error').hide();
 			}
+		});
+
+		$('#contact-form').on('submit', function (event) {
+			event.preventDefault();
+
+			// Prevent multiple submissions
+			if (isSubmitting) {
+				return;
+			}
+
+			// FIRST: Check if checkbox is checked
+			if (!$('#consent-checkbox').is(':checked')) {
+				$('#checkbox-error').show();
+				alert('You must agree to have your details collected before submitting the form.');
+				$('#consent-checkbox').focus();
+				return false; // Stop form submission
+			}
+
+			// Hide error if checkbox is checked
+			$('#checkbox-error').hide();
 
 			// Gather form data
 			var contactData = {
-				name: $('input[name="name"]').val().trim(),
-				email: $('input[name="email"]').val().trim(),
-				message: $('textarea[name="message"]').val().trim(),
-				checkbox: $('.checkbox').is(':checked') ? 1 : 0 // Store checkbox value as 1 or 0
+				name: $('#contact-name').val().trim(),
+				email: $('#contact-email').val().trim(),
+				message: $('#contact-message').val().trim(),
+				checkbox: 1 // We already validated it's checked
 			};
 
-			// Check if all fields are filled
-			if (!contactData.name || !contactData.email || !contactData.message) {
-				alert('Please fill all required fields.');
-				return; // Exit the function if fields are missing
+			// Validate other fields
+			if (!contactData.name) {
+				alert('Please enter your name.');
+				$('#contact-name').focus();
+				return false;
 			}
 
-			// Check if the checkbox is checked
-			if (!$('.checkbox').is(':checked')) {
-				alert('Please check the box to confirm your consent.');
-				return; // Exit the function if not checked
+			if (!contactData.email) {
+				alert('Please enter your email.');
+				$('#contact-email').focus();
+				return false;
 			}
 
-			// Set submitting flag to true
+			// Validate email format
+			var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailPattern.test(contactData.email)) {
+				alert('Please enter a valid email address.');
+				$('#contact-email').focus();
+				return false;
+			}
+
+			if (!contactData.message) {
+				alert('Please enter your message.');
+				$('#contact-message').focus();
+				return false;
+			}
+
+			// Disable submit button
+			$('#send').prop('disabled', true).html('<span>Sending...</span>');
 			isSubmitting = true;
 
 			// Send AJAX request
 			$.ajax({
-				url: '{{ route('contact.store') }}', // Update this to your route
+				url: '{{ route('contact.store') }}',
 				method: 'POST',
 				data: contactData,
 				headers: {
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				},
 				success: function (response) {
 					alert("Message sent successfully!");
 					console.log(response);
-					// Optionally clear the form fields
-					$('input[name="name"]').val(''); // Clear name input
-					$('input[name="email"]').val(''); // Clear email input
-					$('textarea[name="message"]').val(''); // Clear message textarea
-					$('.checkbox').prop('checked', false); // Uncheck the checkbox
+					
+					// Clear form fields
+					@guest
+						$('#contact-name').val('');
+						$('#contact-email').val('');
+					@endguest
+					$('#contact-message').val('');
+					$('#consent-checkbox').prop('checked', false);
 				},
 				error: function (xhr) {
-					console.error(xhr.responseText); // Log error response
-					alert("An error occurred: " + xhr.responseText); // Show error message
+					console.error(xhr.responseText);
+					let errorMessage = "An error occurred. Please try again.";
+					
+					// Parse validation errors if they exist
+					if (xhr.status === 422 && xhr.responseJSON && xhr.responseJSON.errors) {
+						errorMessage = Object.values(xhr.responseJSON.errors).flat().join('\n');
+					}
+					
+					alert(errorMessage);
 				},
 				complete: function () {
-					// Reset submitting flag when done
+					// Re-enable submit button
+					$('#send').prop('disabled', false).html('<span>Submit</span>');
 					isSubmitting = false;
 				}
 			});
 		});
 	});
-
 </script>
-
-
 
 @endsection

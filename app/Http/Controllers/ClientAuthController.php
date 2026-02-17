@@ -25,6 +25,7 @@ class ClientAuthController extends Controller
             'password_confirmation' => 'required|min:6',
             'client_id' => 'required',
         ]);
+        
         $client = Client::create([
             'fname' => $request->fname,
             'lname' => $request->lname,

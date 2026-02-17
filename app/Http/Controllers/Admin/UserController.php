@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -95,14 +96,36 @@ class UserController extends Controller
             'id' => 'required|exists:users,id',
             'role' => 'required|in:admin,employee,client', // Adjust roles as needed
         ]);
-    
+
         // Find the user and update the role
         $user = User::findOrFail($request->id);
         $user->role = $request->role;
         $user->save();
-    
+
         // Redirect back with a success message
         return redirect()->back()->with('success', 'Role updated successfully!');
+    }
+
+    public function report(Request $request)
+    {
+        $query = User::query();
+
+        if ($request->from_date) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+        if ($request->role) {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->latest()->paginate(10);
+
+        return view('admin.user.reports', [
+            'users' => $users,
+            'canExport' => true
+        ]);
     }
 
 }

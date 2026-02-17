@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Client;  
+use App\Models\Client;
 use App\Models\User;
 
 class ClientController extends Controller
@@ -13,7 +14,7 @@ class ClientController extends Controller
     public function index()
     {
         $clients = User::where('role', 'client')->get();
-        return view('admin.client.index',compact('clients'));
+        return view('admin.client.index', compact('clients'));
     }
 
     public function create()
@@ -32,7 +33,7 @@ class ClientController extends Controller
             'client_id' => 'required',
             'phone' => 'required|digits:10',
         ]);
-        
+
         DB::beginTransaction();
 
         try {
@@ -111,5 +112,24 @@ class ClientController extends Controller
             'client_id' => $lastClientId,
         ]);
     }
-    
+
+    public function report(Request $request)
+    {
+        $query = Client::query();
+
+        if ($request->from_date) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        $clients = $query->latest()->paginate(10);
+
+        return view('admin.client.reports', [
+            'clients' => $clients,
+            'canExport' => true
+        ]);
+    }
+
 }

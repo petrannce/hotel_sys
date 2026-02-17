@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +20,7 @@ class EmployeeController extends Controller
         $employees = Employee::all();
         $departments = Department::all();
         $designations = Designation::all();
-        return view('admin.employee.index',compact('employees','departments','designations'));
+        return view('admin.employee.index', compact('employees', 'departments', 'designations'));
     }
 
     public function store(Request $request)
@@ -42,7 +43,7 @@ class EmployeeController extends Controller
 
         // Begin a database transaction
         DB::beginTransaction();
-        
+
         try {
             // Check if the employee already exists
             $employee = Employee::where('employee_id', $request->employee_id)->first();
@@ -76,7 +77,7 @@ class EmployeeController extends Controller
 
             // Commit the transaction
             DB::commit();
-            
+
             return redirect()->back()->with('success', 'Employee created successfully.');
         } catch (\Exception $e) {
             // Rollback the transaction in case of an error
@@ -85,14 +86,14 @@ class EmployeeController extends Controller
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
     }
-    
+
 
     public function edit($id)
     {
         $employee = Employee::find($id);
         $departments = Department::all();
         $designations = Designation::all();
-        return view('admin.employee.editemployee',compact('employee','departments','designations'));
+        return view('admin.employee.editemployee', compact('employee', 'departments', 'designations'));
     }
 
     public function update(Request $request, $id)
@@ -112,7 +113,7 @@ class EmployeeController extends Controller
 
         // Begin a database transaction
         DB::beginTransaction();
-        
+
         try {
             // Check if the employee already exists
             $employee = Employee::where('employee_id', $request->employee_id)->where('id', '!=', $id)->first();
@@ -138,7 +139,7 @@ class EmployeeController extends Controller
             // Commit the transaction
             DB::commit();
             return redirect()->route('employee.index')->with('success', 'Employee updated successfully.');
-            
+
         } catch (\Exception $e) {
             // Rollback the transaction in case of an error
             DB::rollBack();
@@ -153,5 +154,29 @@ class EmployeeController extends Controller
         return redirect()->back()->with('success', 'Employee deleted successfully.');
     }
 
-       
+    public function report(Request $request)
+    {
+        $query = Employee::query();
+
+        if ($request->from_date) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+        if ($request->department) {
+            $query->where('department', $request->department);
+        }
+        if ($request->designation) {
+            $query->where('designation', $request->designation);
+        }
+
+        $employees = $query->latest()->paginate(10);
+
+        return view('admin.employee.reports', [
+            'employees' => $employees,
+            'canExport' => true
+        ]);
+    }
+
 }
