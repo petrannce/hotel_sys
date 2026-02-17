@@ -48,10 +48,10 @@ class RolesAndPermissionsSeeder extends Seeder
         $adminUser = User::firstOrCreate([
             'email' => 'admin@admin.com',
         ], [
-            'fname' => 'Dennis',
-            'lname' => 'Paul',
-            'username' => 'Depaul',
-            'phone' => '0712660170',
+            'fname' => 'Lilian',
+            'lname' => 'Ondoro',
+            'username' => 'Lily',
+            'phone' => '0723885170',
             'password' => bcrypt('123456789'), // Use a secure password
             'role' => 'admin', // Only if this field is necessary
         ]);

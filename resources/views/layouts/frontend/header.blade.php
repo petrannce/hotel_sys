@@ -126,15 +126,15 @@
 				@if(Auth::check())
 					@if(Auth::user()->hasRole('admin'))
 						<li>
-							<a href="{{ route('admin.dashboard') }}"><span>Admin Dashboard</span></a>
+							<a href="{{ route('admin.dashboard') }}" target="_blank"><span>Admin Dashboard</span></a>
 						</li>
 					@elseif(Auth::user()->hasRole('client'))
 						<li>
-							<a href="{{ route('client.dashboard') }}"><span>Dashboard</span></a>
+							<a href="{{ route('client.dashboard') }}" target="_blank"><span>Dashboard</span></a>
 						</li>
 					@elseif(Auth::user()->hasRole('employee'))
 						<li>
-							<a href="{{ route('employee.dashboard') }}"><span>Employee Dashboard</span></a>
+							<a href="{{ route('employee.dashboard') }}" target="_blank"><span>Employee Dashboard</span></a>
 						</li>
 					@endif
 

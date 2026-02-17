@@ -53,4 +53,37 @@ class FrontendController extends Controller
     {
         return view('frontend.home.billing');
     }
+
+    public function services()
+    {
+        return view('frontend.home.services');
+    }
+
+    public function serviceDetails($id)
+    {
+        return view('frontend.home.service-details');
+    }
+
+    public function serviceRequests()
+    {
+        return view('frontend.home.service-requests');
+    }
+
+    public function rooms()
+    {
+        $rooms = Room::all();
+        return view('frontend.room.index', compact('rooms'));
+    }
+
+    public function roomDetails($id)
+    {
+        $room = Room::findOrFail($id);
+        return view('frontend.room.show', compact('room'));
+    }
+
+    public function galleries()
+    {
+        $galleries = Gallery::all();
+        return view('frontend.home.gallery', compact('galleries'));
+    }
 }

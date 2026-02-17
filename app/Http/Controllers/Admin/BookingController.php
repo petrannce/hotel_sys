@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Booking;
@@ -32,7 +33,7 @@ class BookingController extends Controller
             'check_out' => 'required',
         ]);
 
-       // dd($request->all());
+        // dd($request->all());
 
         // Begin a database transaction
         DB::beginTransaction();
@@ -123,24 +124,24 @@ class BookingController extends Controller
 
     public function getAvailableRooms()
     {
-      // Total rooms are numbered 1 to 10
-    $totalRooms = range(1, 10);
+        // Total rooms are numbered 1 to 10
+        $totalRooms = range(1, 10);
 
-    // Fetch rooms that are booked or pending from the database
-    $bookedRooms = DB::table('bookings')
-                     ->where('status', 'pending')
-                     ->orWhere('status', 'booked')
-                     ->pluck('room')
-                     ->toArray();
+        // Fetch rooms that are booked or pending from the database
+        $bookedRooms = DB::table('bookings')
+            ->where('status', 'pending')
+            ->orWhere('status', 'booked')
+            ->pluck('room')
+            ->toArray();
 
-    // Convert room numbers to integers for comparison
-    $bookedRooms = array_map('intval', $bookedRooms);
+        // Convert room numbers to integers for comparison
+        $bookedRooms = array_map('intval', $bookedRooms);
 
-    // Get available rooms by excluding booked/pending rooms
-    $availableRooms = array_diff($totalRooms, $bookedRooms);
+        // Get available rooms by excluding booked/pending rooms
+        $availableRooms = array_diff($totalRooms, $bookedRooms);
 
-    // Return available rooms as a JSON response
-    return response()->json($availableRooms);
+        // Return available rooms as a JSON response
+        return response()->json($availableRooms);
 
     }
 
@@ -155,7 +156,33 @@ class BookingController extends Controller
         $booking->save();
 
         return redirect()->back()->with('success', 'Status updated successfully.');
-        
+
+    }
+
+    public function report(Request $request)
+    {
+        $query = Booking::with(['room']);
+
+        if ($request->from_date) {
+            $query->whereDate('check_in', '>=', $request->from_date);
+        }
+        if ($request->to_date) {
+            $query->whereDate('check_out', '<=', $request->to_date);
+        }
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+        if ($request->room_id) {
+            $query->where('room_id', $request->room_id);
+        }
+
+        $bookings = $query->latest()->paginate(10);
+
+        return view('admin.booking.reports', [
+            'bookings' => $bookings,
+            'rooms' => Room::all(),  // for filter dropdown
+            'canExport' => true
+        ]);
     }
 
 }

@@ -22,6 +22,13 @@
         </div>
         <!-- /Page Header -->
 
+        @include('layouts.partials.filter',[
+                            'filterRoute' => route('users.report'),
+                            'reportRoute' => route('reports.generate'),
+                            'extraFilters' => [],
+                            'type' => 'users',
+                            ])
+
         <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
