@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('employee');
             $table->string('description');
             $table->string('status')->default('pending');
+            $table->decimal('price', 10, 2)->default(0);
             $table->timestamps();
         });
     }

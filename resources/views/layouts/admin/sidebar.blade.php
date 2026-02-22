@@ -163,11 +163,6 @@
                         </li>
 
                         <li>
-                            <a class="{{ Request::route()->getName() == 'service_requests.report' ? 'active' : 'inactive' }}"
-                                href="{{ route('service_requests.report') }}">Service Requests Report</a>
-                        </li>
-
-                        <li>
                             <a class="{{ Request::route()->getName() == 'clients.report' ? 'active' : 'inactive' }}"
                                 href="{{ route('clients.report') }}">Clients Report</a>
                         </li>

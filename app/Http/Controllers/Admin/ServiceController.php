@@ -50,7 +50,7 @@ class ServiceController extends Controller
 
             // Commit the transaction
             DB::commit();
-            return redirect()->back()->with('success', 'Designation added successfully.');
+            return redirect()->back()->with('success', 'Service added successfully.');
 
         } catch (\Exception $e) {
             // Rollback the transaction in case of an error
@@ -61,7 +61,7 @@ class ServiceController extends Controller
 
     public function edit($id)
     {
-        $service = Service::find($id);
+        $service = Service::findOrFail($id);
         return view('admin.service.editinventory', compact('service'));
     }
 
@@ -79,7 +79,7 @@ class ServiceController extends Controller
         try {
 
             // Create a new service
-            $service = Service::find($id);
+            $service = Service::findOrFail($id);
             $service->name = $request->name;
             $service->department = $request->department;
             $service->save();
@@ -97,30 +97,42 @@ class ServiceController extends Controller
 
     public function destroy($id)
     {
-        $service = Service::find($id);
+        $service = Service::findOrFail($id);
         $service->delete();
         return redirect()->back()->with('success', 'Service deleted successfully.');
     }
 
     public function report(Request $request)
     {
+        $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date|after_or_equal:from_date',
+            'department' => 'nullable|string',
+        ]);
+
         $query = Service::query();
 
         if ($request->from_date) {
             $query->whereDate('created_at', '>=', $request->from_date);
         }
+
         if ($request->to_date) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
+
         if ($request->department) {
             $query->where('department', $request->department);
         }
 
         $services = $query->latest()->paginate(10);
+        $departments = Department::all();
 
+        // Don't calculate status - services don't have status
         return view('admin.service.reports', [
             'services' => $services,
-            'canExport' => true
+            'departments' => $departments,
+            'canExport' => true,
+            'filters' => $request->only(['from_date', 'to_date', 'department'])
         ]);
     }
 

@@ -50,7 +50,7 @@ class ServiceRequestController extends Controller
     {
         $services = Service::all();
         $employees = Employee::all();
-        return view('admin.service.request', compact('services', 'employees'));
+        return view('admin.service_request.create', compact('services', 'employees'));
     }
 
     public function store(Request $request)
@@ -92,7 +92,7 @@ class ServiceRequestController extends Controller
         $service_request = ServiceRequest::find($id);
         $services = Service::all();
         $employees = Employee::all();
-        return view('admin.service.editrequest', compact('service_request', 'services', 'employees'));
+        return view('admin.service_request.edit', compact('service_request', 'services', 'employees'));
     }
 
     public function update(Request $request, $id)
@@ -126,31 +126,6 @@ class ServiceRequestController extends Controller
 
         return redirect()->back()->with('success', 'Status updated successfully.');
 
-    }
-
-    public function report(Request $request)
-    {
-        $query = ServiceRequest::query();
-
-        if ($request->from_date) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-        if ($request->to_date) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-        if ($request->status) {
-            $query->where('status', $request->status);
-        }
-        if ($request->service) {
-            $query->where('service', $request->service);
-        }
-
-        $service_requests = $query->latest()->paginate(10);
-
-        return view('admin.service_requests.reports', [
-            'service_requests' => $service_requests,
-            'canExport' => true
-        ]);
     }
 
 }

@@ -25,5 +25,11 @@ class Booking extends Model
     {
         return $this->belongsTo(Room::class);
     }
+
+    // A booking has one billing
+    public function billing()
+    {
+        return $this->hasOne(Billing::class);
+    }
    
 }
