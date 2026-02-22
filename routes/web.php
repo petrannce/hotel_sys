@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BillingController;
 use App\Http\Controllers\Admin\HotelDetailsController;
 use App\Http\Controllers\Admin\ReportController;
 use Illuminate\Support\Facades\Route;
@@ -129,7 +130,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::put('/service-request/{id}/update', 'update')->name('request.update');
         Route::delete('/service-request/{id}/delete', 'destroy')->name('request.destroy');
         Route::patch('/service-request/{id}/status', 'updateStatus')->name('request.updateStatus');
-        Route::get('/service-requests-report', 'report')->name('service_requests.report');
     });
 
     //booking
@@ -179,6 +179,22 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::delete('/client/{id}/delete', 'destroy')->name('client.destroy');
         Route::get('/client/latest_id', 'latestId')->name('client.latest_id');
         Route::get('/clients-report', 'report')->name('clients.report');
+    });
+
+    // Billing and Invoices
+    Route::controller(BillingController::class)->prefix('admin')->group(function () {
+        Route::get('/billing', 'index')->name('billing.index');
+        Route::get('/billing/create', 'create')->name('billing.create');
+        Route::post('/billing', 'store')->name('billing.store');
+        Route::get('/billing/{id}/edit', 'edit')->name('billing.edit');
+        Route::put('/billing/{id}', 'update')->name('billing.update');
+        Route::get('/billing/{id}', 'show')->name('billing.show');
+        Route::delete('/billing/{id}', 'destroy')->name('billing.destroy');
+        Route::get('/billing/{id}/invoice', 'generateInvoice')->name('billing.invoice');
+        Route::get('/billing-report', 'report')->name('billing.report');
+        Route::get('/billings/{billing}/receipt', 'showReceipt')->name('billing.receipt');
+        Route::get('/billings/{billing}/download-pdf', 'downloadPDF')->name('billings.downloadPDF');
+        Route::get('/billings/{id}/resend', [BillingController::class, 'resendEmail'])->name('billings.resendEmail');
     });
 
     // Hotel Details
